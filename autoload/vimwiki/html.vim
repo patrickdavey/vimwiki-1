@@ -230,13 +230,21 @@ function! s:is_html_uptodate(wikifile) "{{{
   endif
 
   let wikifile = fnamemodify(a:wikifile, ":p")
-  let htmlfile = expand(VimwikiGet('path_html').VimwikiGet('subdir').
-        \fnamemodify(wikifile, ":t:r").".html")
+  let sanitized_wikiname = s:filename_modifier(wikifile)
+  let htmlfile = expand(VimwikiGet('path_html').VimwikiGet('subdir').sanitized_wikiname)
 
   if getftime(wikifile) <= getftime(htmlfile) && tpl_time <= getftime(htmlfile)
     return 1
   endif
   return 0
+endfunction "}}}
+
+function! s:filename_modifier(wikifile) "{{{
+  let sanitized = fnamemodify(a:wikifile, ":t:r").".html"
+  let lower_sanitized = tolower(sanitized)
+  let s = substitute(lower_sanitized, '\s\+',"-", "g")
+  let n = substitute(s, '\-\+',"-", "g")
+  return n
 endfunction "}}}
 
 function! s:html_insert_contents(html_lines, content) "{{{
@@ -1523,7 +1531,6 @@ function! vimwiki#html#WikiAll2HTML(path_html) "{{{
   call vimwiki#path#mkdir(path_html)
 
   echomsg 'Deleting non-wiki html files...'
-  call s:delete_html_files(path_html)
 
   echomsg 'Converting wiki to html files...'
   let setting_more = &more
