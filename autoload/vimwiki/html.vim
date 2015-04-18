@@ -240,11 +240,11 @@ function! s:is_html_uptodate(wikifile) "{{{
 endfunction "}}}
 
 function! s:filename_modifier(wikifile) "{{{
-  let sanitized = fnamemodify(a:wikifile, ":t:r").".html"
+  let sanitized = fnamemodify(a:wikifile, ":t:r")
   let lower_sanitized = tolower(sanitized)
-  let s = substitute(lower_sanitized, '\s\+',"-", "g")
+  let s = substitute(lower_sanitized, '[^a-z0-9_-]\+',"-", "g")
   let n = substitute(s, '\-\+',"-", "g")
-  return n
+  return n.".html"
 endfunction "}}}
 
 function! s:html_insert_contents(html_lines, content) "{{{
